@@ -1,0 +1,78 @@
+name: Update Security IP Lists
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  update-ips:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Fetch All IP Lists
+        run: |
+          mkdir -p ip_list
+          
+          # Core Lists
+          curl -s https://www.cloudflare.com/ips-v4 > ip_list/cloudflare_ips.lst
+          echo "" >> ip_list/cloudflare_ips.lst
+          curl -s https://www.cloudflare.com/ips-v6 >> ip_list/cf_ips.lst
+          curl -s https://check.torproject.org/exit-addresses | grep ExitAddress | awk '{print $2}' | sort | uniq > ip_list/tor_ips.lst
+          curl -s https://raw.githubusercontent.com/X4BNet/lists_vpn/main/output/datacenter/ipv4.txt > ip_list/datacenter_ips.lst
+          curl -s https://raw.githubusercontent.com/X4BNet/lists_vpn/main/output/vpn/ipv4.txt > ip_list/vpn_ips.lst
+
+          curl -s https://stripe.com/files/ips/ips_webhooks.txt > ip_list/stripe_webhook_ips.lst
+
+          {
+            curl -s https://raw.githubusercontent.com/AnTheMaker/GoodBots/refs/heads/main/iplists/googlebot.ips; echo
+            curl -s https://raw.githubusercontent.com/AnTheMaker/GoodBots/refs/heads/main/iplists/duckduckbot.ips; echo
+            curl -s https://raw.githubusercontent.com/AnTheMaker/GoodBots/refs/heads/main/iplists/facebookbot.ips; echo
+            curl -s https://raw.githubusercontent.com/AnTheMaker/GoodBots/refs/heads/main/iplists/bingbot.ips; echo
+            curl -s https://raw.githubusercontent.com/AnTheMaker/GoodBots/refs/heads/main/iplists/telegrambot.ips; echo
+            curl -s https://raw.githubusercontent.com/AnTheMaker/GoodBots/refs/heads/main/iplists/twitterbot.ips; echo
+            curl -s https://raw.githubusercontent.com/AnTheMaker/GoodBots/refs/heads/main/iplists/yandex.ips; echo
+            curl -s https://raw.githubusercontent.com/AnTheMaker/GoodBots/refs/heads/main/iplists/applebot.ips; echo
+          } > goodbots_combined.tmp
+          
+          sed -i 's/\r//' goodbots_combined.tmp
+          grep -E '^(([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))?|([0-9a-fA-F]{0,4}:){1,7}[0-9a-fA-F]{0,4}(\/([0-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8]))?)$' goodbots_combined.tmp | sort -u > ip_list/good_bots.lst
+          rm goodbots_combined.tmp
+          
+          # THREATS.LST
+          {
+            curl -s https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_level1.netset; echo
+            curl -s https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_proxies.netset; echo
+            curl -s https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/botscout_7d.ipset; echo
+            curl -s https://raw.githubusercontent.com/NETMOUNTAINS/Curated-IP-Blocklist/main/ip-blacklist.list; echo
+            curl -s https://raw.githubusercontent.com/elliotwutingfeng/ThreatFox-IOC-IPs/main/ips.txt; echo
+            curl -s https://raw.githubusercontent.com/stamparm/ipsum/refs/heads/master/levels/2.txt; echo
+            curl -s https://raw.githubusercontent.com/duggytuxy/Data-Shield_IPv4_Blocklist/refs/heads/main/prod_data-shield_ipv4_blocklist.txt; echo
+            curl -s https://binarydefense.com/banlist.txt; echo
+            curl -s https://blocklist.greensnow.co/greensnow.txt; echo
+            curl -s https://cinsscore.com/list/ci-badguys.txt; echo
+            curl -s https://rules.emergingthreats.net/blockrules/compromised-ips.txt; echo
+            curl -s https://feodotracker.abuse.ch/downloads/ipblocklist_aggressive.txt; echo
+            curl -s https://www.stopforumspam.com/downloads/toxic_ip_cidr.txt; echo
+            curl -s https://raw.githubusercontent.com/borestad/blocklist-abuseipdb/refs/heads/main/abuseipdb-s100-30d.ipv4; echo
+
+          } > combined.tmp
+          
+          sed -i 's/\r//' combined.tmp
+          grep -E '^(([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))?|([0-9a-fA-F]{0,4}:){1,7}[0-9a-fA-F]{0,4}(\/([0-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8]))?)$' combined.tmp | sort -u > ip_list/threats.lst
+          rm combined.tmp
+
+      - name: Commit and Push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          if git diff --cached --quiet; then
+            echo "No changes detected across any lists"
+          else
+            git commit -m "chore: auto-update security ip lists"
+            git push
+          fi
