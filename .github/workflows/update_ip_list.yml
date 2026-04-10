@@ -45,8 +45,10 @@ jobs:
           # THREATS.LST
           {
             curl -s https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_level1.netset; echo
+            curl -s https://raw.githubusercontent.com/firehol/blocklist-ipsets/refs/heads/master/firehol_level2.netset; echo
             curl -s https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_proxies.netset; echo
             curl -s https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/botscout_7d.ipset; echo
+            curl -s https://raw.githubusercontent.com/firehol/blocklist-ipsets/refs/heads/master/dshield_7d.netset; echo
             curl -s https://raw.githubusercontent.com/NETMOUNTAINS/Curated-IP-Blocklist/main/ip-blacklist.list; echo
             curl -s https://raw.githubusercontent.com/elliotwutingfeng/ThreatFox-IOC-IPs/main/ips.txt; echo
             curl -s https://raw.githubusercontent.com/stamparm/ipsum/refs/heads/master/levels/2.txt; echo
