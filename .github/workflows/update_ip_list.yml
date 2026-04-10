@@ -20,7 +20,7 @@ jobs:
           # Core Lists
           curl -s https://www.cloudflare.com/ips-v4 > ip_list/cloudflare_ips.lst
           echo "" >> ip_list/cloudflare_ips.lst
-          curl -s https://www.cloudflare.com/ips-v6 >> ip_list/cf_ips.lst
+          curl -s https://www.cloudflare.com/ips-v6 >> ip_list/cloudflare_ips.lst
           curl -s https://check.torproject.org/exit-addresses | grep ExitAddress | awk '{print $2}' | sort | uniq > ip_list/tor_ips.lst
           curl -s https://raw.githubusercontent.com/X4BNet/lists_vpn/main/output/datacenter/ipv4.txt > ip_list/datacenter_ips.lst
           curl -s https://raw.githubusercontent.com/X4BNet/lists_vpn/main/output/vpn/ipv4.txt > ip_list/vpn_ips.lst
@@ -49,6 +49,7 @@ jobs:
             curl -s https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/firehol_proxies.netset; echo
             curl -s https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/botscout_7d.ipset; echo
             curl -s https://raw.githubusercontent.com/firehol/blocklist-ipsets/refs/heads/master/dshield_7d.netset; echo
+            curl -s https://raw.githubusercontent.com/firehol/blocklist-ipsets/refs/heads/master/cleantalk_updated_1d.ipset; echo
             curl -s https://raw.githubusercontent.com/NETMOUNTAINS/Curated-IP-Blocklist/main/ip-blacklist.list; echo
             curl -s https://raw.githubusercontent.com/elliotwutingfeng/ThreatFox-IOC-IPs/main/ips.txt; echo
             curl -s https://raw.githubusercontent.com/stamparm/ipsum/refs/heads/master/levels/2.txt; echo
