@@ -22,10 +22,10 @@ jobs:
         with:
           workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          export_default_credentials: true
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
 
       - name: Upload lists to GCS
-        uses: google-github-actions/upload-cloud-storage@v2
-        with:
-          path: ip_list
-          destination: ${{ secrets.GCP_IP_LISTS_BUCKET }}
-          parent: false
+        run: gcloud storage cp ip_list/*.lst gs://${{ secrets.GCP_IP_LISTS_BUCKET }}/
