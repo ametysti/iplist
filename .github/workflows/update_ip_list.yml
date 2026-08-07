@@ -25,6 +25,10 @@ jobs:
           curl -s https://raw.githubusercontent.com/X4BNet/lists_vpn/main/output/datacenter/ipv4.txt > ip_list/datacenter_ips.lst
           curl -s https://raw.githubusercontent.com/X4BNet/lists_vpn/main/output/vpn/ipv4.txt > ip_list/vpn_ips.lst
 
+          curl -s https://bunnycdn.com/api/system/edgeserverlist/plain > ip_list/bunnynet_ips.lst
+          echo "" >> haproxy/ip_list/bunnynet_ips.lst
+          curl -s https://bunnycdn.com/api/system/edgeserverlist/ipv6/plain >> ip_list/bunnynet_ips.lst
+
           curl -s https://stripe.com/files/ips/ips_webhooks.txt > ip_list/stripe_webhook_ips.lst
 
           {
